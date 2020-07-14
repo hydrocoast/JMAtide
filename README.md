@@ -118,5 +118,5 @@ legend(lines, {'布良','東京','岡田','三宅島（坪田）','小田原','�
 MIT
 
 ## Author
-[Takuya Miyashita](https://hydrocoast.jp)  
+[Takuya Miyashita](https://github.com/hydrocoast)  
 miyashita@hydrocoast.jp
