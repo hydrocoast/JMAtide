@@ -2,6 +2,8 @@
 ## 概要
 このリポジトリは[気象庁](https://www.jma.go.jp/jma/index.html)が
 ウェブサイトで公開している「潮汐観測資料」の毎時潮位・潮位偏差のデータ取得ツールです．   
+[潮汐観測資料 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/genbo/format.html)
+を参考に構築されています．  
 実行には MATLAB が必要です．
 
 ## 使い方
@@ -48,19 +50,18 @@ PlotSSH，PlotSSHA で取得したデータの簡易的なプロットが可能�
 % 潮位のプロット
 tidegauge.PlotSSH;
 ```
-![/Users/miyashita/Research/AMR/hagibis/jma/JMAtide_example_images/figure_0.png
-](JMAtide_example_images//Users/miyashita/Research/AMR/hagibis/jma/JMAtide_example_images/figure_0.png
-)
+<p align="center">
+<img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_0.png", width="500">
+</p>  
 
 
 ```matlab:Code
 % 潮位偏差のプロット
 tidegauge.PlotSSHA;
 ```
-![/Users/miyashita/Research/AMR/hagibis/jma/JMAtide_example_images/figure_1.png
-](JMAtide_example_images//Users/miyashita/Research/AMR/hagibis/jma/JMAtide_example_images/figure_1.png
-)
-
+<p align="center">
+<img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_1.png", width="500">
+</p>  
 
 ### 長期（２ヶ月以上）のデータ取得
 年月の指定部分に配列を入力することで，長期間の潮位データを対象とすることが可能です．
@@ -80,9 +81,9 @@ tidegauge = JMAtide('東京', 2019, 8:11) % 2019年9月〜11月, (1x4)配列
 tidegauge = tidegauge.LoadSSHA;
 tidegauge.PlotSSHA;
 ```
-![/Users/miyashita/Research/AMR/hagibis/jma/JMAtide_example_images/figure_2.png
-](JMAtide_example_images//Users/miyashita/Research/AMR/hagibis/jma/JMAtide_example_images/figure_2.png
-)
+<p align="center">
+<img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_2.png", width="500">
+</p>  
 
 ### 複数地点のデータ取得
 地点名を cell 配列で複数指定すると，複数地点の潮位データを同時に扱えます．
@@ -99,9 +100,9 @@ lines = tidegauge.PlotSSHA;
 xlim([tidegauge(1).time(24*8)+hours(1), tidegauge(1).time(24*14)])
 legend(lines, {'布良','東京','岡田','三宅島（坪田）','小田原','石廊崎','内浦','清水港','御前崎'}, 'NumColumns',2, 'Location','NorthWest');
 ```
-![/Users/miyashita/Research/AMR/hagibis/jma/JMAtide_example_images/figure_3.png
-](JMAtide_example_images//Users/miyashita/Research/AMR/hagibis/jma/JMAtide_example_images/figure_3.png
-)
+<p align="center">
+<img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_3.png", width="500">
+</p>  
 
 
 ## 注意
