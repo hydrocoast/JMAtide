@@ -1,0 +1,14 @@
+*~
+*.o
+*.mod
+*.swp
+*.asc
+*.png
+*.jpg
+*.svg
+*.eps
+*.pdf
+*.ps
+*.pyc
+.DS_Store
+tmp*
