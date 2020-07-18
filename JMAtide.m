@@ -12,11 +12,11 @@ classdef JMAtide
         lat
         url_ssh
         url_ssha
+        unit = 'cm';
     end
     
     %% Properties as constants
     properties (Constant)
-        unit = 'cm';
         standard_time = 'JST(UTC+9)'
     end
     
@@ -153,7 +153,12 @@ classdef JMAtide
             % % convert
             dat = cellfun(@strtrim, dat, 'UniformOutput', false);
             dat = cell2mat(cellfun(@str2double, dat, 'UniformOutput', false))';
-            obj.ssh = dat(:);
+            if strcmp(obj.unit,'m')
+                factor = 0.01;
+            else
+                factor = 1.0;
+            end
+            obj.ssh = factor*dat(:);
         end
         
         %% read sea surface height anomaly (SSHA) from URL
@@ -187,10 +192,46 @@ classdef JMAtide
             % % convert
             dat = cellfun(@strtrim, dat, 'UniformOutput', false);
             dat = cell2mat(cellfun(@str2double, dat, 'UniformOutput', false))';
-            obj.ssha = dat(:);
+            if strcmp(obj.unit,'m')
+                factor = 0.01;
+            else
+                factor = 1.0;
+            end
+            obj.ssha = factor*dat(:);
         end
         
-
+        %% Convert Unit
+        function obj = ConvertUnit(obj, unitstr)
+            % % check arguments
+            if ~ischar(unitstr); error('Unit specification must be "cm" or "m".'); end
+            if ~strcmp(unitstr,'cm') && ~strcmp(unitstr,'m'); error('Unit specification must be "cm" or "m".'); end
+            
+            % % if object array
+            if numel(obj)>1
+                for i = 1:numel(obj)
+                    obj(i) = obj(i).ConvertUnit(unitstr);
+                end
+                return
+            end
+            
+            % % check
+            if strcmp(unitstr,obj.unit)
+                disp('No need to convert')
+                return
+            end
+                        
+            % % define the factor to convert
+            if strcmp(unitstr,'m')
+                factor = 0.01;
+            else
+                factor = 100.0;
+            end
+                        
+            % % convert
+            if ~isempty(obj.ssh) ; obj.ssh  = factor*obj.ssh; end
+            if ~isempty(obj.ssha); obj.ssha = factor*obj.ssha; end
+            obj.unit = unitstr;
+        end
     end
 
     %% Methods for plotting
@@ -226,8 +267,127 @@ classdef JMAtide
         end        
     end
     
+    %% Methods for output
+    methods
+        %% SSH
+        function CSVSSH(obj)
+            nobj = numel(obj);
+            T = JMAtide.CreateReferenceTable;
+            
+            % % setup
+            iobj = 1;
+            foutmatrix = [];
+            stationlist = '# time, ';
+            postfix = '';
+            
+            % % loop count
+            while iobj <= nobj
+                % % skip if empty
+                if isempty(obj(iobj).time) || isempty(obj(iobj).ssh)
+                    disp(['Empty: ', obj(iobj).station])
+                    iobj = iobj + 1;
+                    continue
+                end
+                
+                % % assign output matrix
+                t = obj(iobj).time;
+                foutmatrix = horzcat(foutmatrix, obj(iobj).ssh);
+                stationlist = horzcat(stationlist, obj(iobj).station,', ');
+                row = find(strcmp(obj(iobj).station,T.Name_ja), 1);
+                postfix = horzcat(postfix, T.ID{row});
+                
+                % % filename of output
+                fname = ['sealevel_',num2str(obj(iobj).year, '%04d'), ...
+                         num2str(obj(iobj).month, '%02d'), ...
+                         '_',postfix,'.dat'];
+                     
+                % % end of list
+                if iobj == nobj
+                    disp(fname)
+                    stationlist(end-1:end) = [];
+                    JMAtide.OutputTimeSeries(fname, stationlist, t, foutmatrix)
+                    break
+                end
+                
+                % % output if the period is different from the next one
+                if obj(iobj).year~=obj(iobj+1).year || obj(iobj).month~=obj(iobj+1).month || ...
+                   isempty(obj(iobj+1).time) || isempty(obj(iobj+1).ssh)
+                    disp(fname)
+                    stationlist(end-1:end) = [];
+                    JMAtide.OutputTimeSeries(fname, stationlist, t, foutmatrix)
+                    
+                    foutmatrix = [];
+                    stationlist = '# time, ';
+                    postfix = '';
+                end
+                
+                iobj = iobj + 1;
+            end
+            % % loop end
+        end
+        
+        %% SSHA
+        function CSVSSHA(obj)
+            nobj = numel(obj);
+            T = JMAtide.CreateReferenceTable;
+            
+            % % setup
+            iobj = 1;
+            foutmatrix = [];
+            stationlist = '# time, ';
+            postfix = '';
+            
+            % % loop count
+            while iobj <= nobj
+                % % skip if empty
+                if isempty(obj(iobj).time) || isempty(obj(iobj).ssha)
+                    disp(['Empty: ', obj(iobj).station])
+                    iobj = iobj + 1;
+                    continue
+                end
+                
+                % % assign output matrix                
+                t = obj(iobj).time;
+                foutmatrix = horzcat(foutmatrix, obj(iobj).ssha);
+                stationlist = horzcat(stationlist, obj(iobj).station,', ');
+                row = find(strcmp(obj(iobj).station,T.Name_ja), 1);
+                postfix = horzcat(postfix, T.ID{row});
+                
+                % % filename of output
+                fname = ['sealevelanomaly_', num2str(obj(iobj).year, '%04d'), ...
+                         num2str(obj(iobj).month, '%02d'), ...
+                         '_',postfix,'.dat'];
+
+                % % end of list
+                if iobj == nobj
+                    disp(fname)
+                    stationlist(end-1:end) = [];
+                    JMAtide.OutputTimeSeries(fname, stationlist, t, foutmatrix)
+                    break
+                end
+                
+                % % output if the period is different from the next one
+                if obj(iobj).year~=obj(iobj+1).year || obj(iobj).month~=obj(iobj+1).month || ...
+                   isempty(obj(iobj+1).time) || isempty(obj(iobj+1).ssha)
+                    disp(fname)
+                    stationlist(end-1:end) = [];
+                    JMAtide.OutputTimeSeries(fname, stationlist, t, foutmatrix)
+                    
+                    foutmatrix = [];
+                    stationlist = '# time, ';
+                    postfix = '';
+                end
+                
+                iobj = iobj + 1;
+            end
+            % % loop end
+        end
+        
+    end
+    
     %% Static methods
     methods (Static)
+        %% Table of stations
         function T = CreateReferenceTable
             % % columns
             Number = {1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;53;54;55;56;57;58;59;60;61;62;63;64;65;66;67;68;69;70};
@@ -245,5 +405,26 @@ classdef JMAtide
             T = table(Number,ID,Name_ja,Address,Latitude,Longitude,Type,Height_above_the_reference_plane,Elevation,Elevation_of_the_reference_plane,Note);
             return
         end
+        
+        %% Output time-series data 
+        function OutputTimeSeries(fname, stationlist, t, foutmatrix)
+            if isempty(foutmatrix); return; end
+            
+            [nrow, ncol] = size(foutmatrix);
+            if ncol == 1
+                fmt = '%9.3f\n';
+            else
+                fmt = [repmat('%9.3f,',[1, ncol-1]),'%9.3f\n'];
+            end
+            
+            fid = fopen(fname,'w');
+            fprintf(fid, '%s\n', stationlist);
+            for line = 1:nrow
+                fprintf(fid, '%s', datestr(t(line),'YYYYmmddThhMM,'));
+                fprintf(fid, fmt, foutmatrix(line,:));
+            end
+            fclose(fid);
+        end
+
     end
 end
