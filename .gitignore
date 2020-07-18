@@ -10,6 +10,11 @@
 *.pdf
 *.ps
 *.pyc
+*.dat
+*.tex
+*.sty
+JMAtide_example.md
 .DS_Store
 tmp*
+*livescript2markdown*/
 !images/*
