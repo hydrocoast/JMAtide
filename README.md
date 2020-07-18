@@ -115,24 +115,18 @@ legend(lines, {'布良','東京','岡田','三宅島（坪田）','小田原','�
 CSVSSH，CSVSSHAでそれぞれ潮位，潮位偏差を CSV ファイルとして出力します．
 データの期間（年，月）が同じであれば，複数の地点を1つのファイルにまとめて出力します．
 
-```matlab:Code
+```matlab
 % ファイル出力前に，単位を cm → m へ
 tidegauge = tidegauge.ConvertUnit('m');
 
 % CSVファイルとして出力
 % 同一期間のため，全地点のデータを1つのファイルに格納
 tidegauge.CSVSSH  % 潮位
-```
-```text
-sealevel_201910_MRTKOKMJODG9UCSMOM.dat
-```
-
-```matlab
 tidegauge.CSVSSHA % 潮位偏差
 ```
-```text
+sealevel_201910_MRTKOKMJODG9UCSMOM.dat  
 sealevelanomaly_201910_MRTKOKMJODG9UCSMOM.dat
-```
+
 
 ```matlab
 % 出力ファイルの確認 1行目〜10行目
