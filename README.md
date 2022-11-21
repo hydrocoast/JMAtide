@@ -54,7 +54,7 @@ PlotSSH，PlotSSHA で取得したデータの簡易的なプロットが可能�
 tidegauge.plotssh;
 ```
 <p align="center">
-<img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_0.png", width="600">
+<img src="/images/figure_0.png", width="600">
 </p>  
 
 
@@ -63,7 +63,7 @@ tidegauge.plotssh;
 tidegauge.plotssha;
 ```
 <p align="center">
-<img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_1.png", width="600">
+<img src="/images/figure_1.png", width="600">
 </p>  
 
 ### 長期（２ヶ月以上）のデータ取得
@@ -85,7 +85,7 @@ tidegauge = tidegauge.loadssha;
 tidegauge.plotssha;
 ```
 <p align="center">
-<img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_2.png", width="600">
+<img src="/images/figure_2.png", width="600">
 </p>  
 
 ### 複数地点のデータ取得
@@ -107,7 +107,7 @@ xlim([tidegauge(1).Time(24*8)+hours(1), tidegauge(1).Time(24*14)])
 legend(lines, {'布良','東京','岡田','三宅島（坪田）','小田原','石廊崎','内浦','清水港','御前崎'}, 'NumColumns',2, 'Location','NorthWest');
 ```
 <p align="center">
-<img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_3.png", width="600">
+<img src="/images/figure_3.png", width="600">
 </p>  
 
 
