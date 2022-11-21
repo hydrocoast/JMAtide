@@ -1,23 +1,23 @@
 classdef JMAtide
     %% Properties
     properties
-        station
-        year
-        month
-        time
-        ndays
-        ssh   % sea surface height
-        ssha  % sea surface height anomaly
-        lon
-        lat
-        url_ssh
-        url_ssha
-        unit = 'cm';
+        Station
+        Year
+        Month
+        Time
+        Ndays
+        SSH   % sea surface height
+        SSHanomaly  % sea surface height anomaly
+        Lon
+        Lat
+        URL_ssh
+        URL_ssha
+        Unit = 'cm';
     end
     
     %% Properties as constants
     properties (Constant)
-        standard_time = 'JST(UTC+9)'
+        StandardTime = 'JST(UTC+9)'
     end
     
     %% Methods (Constructor)
@@ -83,14 +83,14 @@ classdef JMAtide
                 % % assign properties
                 for i = 1:nstation
                     for j = 1:nrow
-                        obj(i,j).station = stationname{i};
-                        obj(i,j).year = year(j);
-                        obj(i,j).month = month(j);
+                        obj(i,j).Station = stationname{i};
+                        obj(i,j).Year = year(j);
+                        obj(i,j).Month = month(j);
                     end
                 end
                 
                 % % file URL
-                obj = obj.SetProperty;
+                obj = obj.setproperty;
             end            
         end
     end
@@ -98,53 +98,53 @@ classdef JMAtide
     %% Methods for data processing
     methods
         %% set properties
-        function obj = SetProperty(obj)
+        function obj = setproperty(obj)
             urlbase = 'https://www.data.jma.go.jp/gmd/kaiyou/data/db/tide/genbo/YYYY/YYYYMM/hryYYYYMMSTATION.txt';
-            T = JMAtide.CreateReferenceTable;
+            T = JMAtide.createReferenceTable;
             for i = 1:numel(obj)
                 % % url 
                 url1 = urlbase;
-                url1 = strrep(url1, 'MM', num2str(obj(i).month,'%02d'));
-                url1 = strrep(url1, 'YYYY', num2str(obj(i).year,'%04d'));
-                row = find(strcmp(obj(i).station,T.Name_ja), 1);
+                url1 = strrep(url1, 'MM', num2str(obj(i).Month,'%02d'));
+                url1 = strrep(url1, 'YYYY', num2str(obj(i).Year,'%04d'));
+                row = find(strcmp(obj(i).Station,T.Name_ja), 1);
                 if isempty(row)
-                    disp(['Station name ', obj(i).station,' was not found.'])
+                    disp(['Station name ', obj(i).Station,' was not found.'])
                     continue
                 end
                 url1 = strrep(url1, 'STATION', T.ID{row});
                 url2 = strrep(url1, 'hry', 'dep');
                 
                 % % 
-                obj(i).url_ssh = url1;
-                obj(i).url_ssha = url2;
-                obj(i).lon = T.Longitude{row};
-                obj(i).lat = T.Latitude{row};
+                obj(i).URL_ssh = url1;
+                obj(i).URL_ssha = url2;
+                obj(i).Lon = T.Longitude{row};
+                obj(i).Lat = T.Latitude{row};
             end                            
         end
         
         %% read sea surface height (SSH) from URL
-        function obj = LoadSSH(obj)
+        function obj = loadssh(obj)
             % % array
             if numel(obj)>1
                 for i = 1:numel(obj)
-                    obj(i) = obj(i).LoadSSH;
+                    obj(i) = obj(i).loadssh;
                 end
                 return
             end
             
             % % scalar
             % % read from the original source
-            txt = webread(obj.url_ssh);
+            txt = webread(obj.URL_ssh);
             
             % % calc the number of the day in month
-            obj.ndays = length(txt)/137;
+            obj.Ndays = length(txt)/137;
             
             % % % assign time series
-            obj.time = permute(datetime(obj.year, obj.month, 1):hours(1):datetime(obj.year, obj.month, obj.ndays, 23, 0, 0), [2,1]);
+            obj.Time = permute(datetime(obj.Year, obj.Month, 1):hours(1):datetime(obj.Year, obj.Month, obj.Ndays, 23, 0, 0), [2,1]);
                         
             % % assign SSH
-            dat = cell(obj.ndays,24);
-            for i = 1:obj.ndays
+            dat = cell(obj.Ndays,24);
+            for i = 1:obj.Ndays
                 for j = 1:24
                     dat{i,j} = txt((i-1)*137+(j-1)*3+1:(i-1)*137+j*3);
                 end
@@ -153,37 +153,37 @@ classdef JMAtide
             % % convert
             dat = cellfun(@strtrim, dat, 'UniformOutput', false);
             dat = cell2mat(cellfun(@str2double, dat, 'UniformOutput', false))';
-            if strcmp(obj.unit,'m')
+            if strcmp(obj.Unit,'m')
                 factor = 0.01;
             else
                 factor = 1.0;
             end
-            obj.ssh = factor*dat(:);
+            obj.SSH = factor*dat(:);
         end
         
         %% read sea surface height anomaly (SSHA) from URL
-        function obj = LoadSSHA(obj)
+        function obj = loadssha(obj)
             % % array
             if numel(obj)>1
                 for i = 1:numel(obj)
-                    obj(i) = obj(i).LoadSSHA;
+                    obj(i) = obj(i).loadssha;
                 end
                 return
             end
             
             % % scalar            
             % % read from the original source
-            txt = webread(obj.url_ssha);
+            txt = webread(obj.URL_ssha);
 
             % % calc the number of the day in month
-            obj.ndays = length(txt)/107;
+            obj.Ndays = length(txt)/107;
 
             % % assign time series
-            obj.time = permute(datetime(obj.year, obj.month, 1):hours(1):datetime(obj.year, obj.month, obj.ndays, 23, 0, 0), [2,1]);
+            obj.Time = permute(datetime(obj.Year, obj.Month, 1):hours(1):datetime(obj.Year, obj.Month, obj.Ndays, 23, 0, 0), [2,1]);
             
             % % assign SSHA
-            dat = cell(obj.ndays,24);
-            for i = 1:obj.ndays
+            dat = cell(obj.Ndays,24);
+            for i = 1:obj.Ndays
                 for j = 1:24
                     dat{i,j} = txt((i-1)*107+(j-1)*4+1:(i-1)*107+j*4);
                 end
@@ -192,16 +192,16 @@ classdef JMAtide
             % % convert
             dat = cellfun(@strtrim, dat, 'UniformOutput', false);
             dat = cell2mat(cellfun(@str2double, dat, 'UniformOutput', false))';
-            if strcmp(obj.unit,'m')
+            if strcmp(obj.Unit,'m')
                 factor = 0.01;
             else
                 factor = 1.0;
             end
-            obj.ssha = factor*dat(:);
+            obj.SSHanomaly = factor*dat(:);
         end
         
         %% Convert Unit
-        function obj = ConvertUnit(obj, unitstr)
+        function obj = convertunit(obj, unitstr)
             % % check arguments
             if ~ischar(unitstr); error('Unit specification must be "cm" or "m".'); end
             if ~strcmp(unitstr,'cm') && ~strcmp(unitstr,'m'); error('Unit specification must be "cm" or "m".'); end
@@ -209,13 +209,13 @@ classdef JMAtide
             % % if object array
             if numel(obj)>1
                 for i = 1:numel(obj)
-                    obj(i) = obj(i).ConvertUnit(unitstr);
+                    obj(i) = obj(i).convertunit(unitstr);
                 end
                 return
             end
             
             % % check
-            if strcmp(unitstr,obj.unit)
+            if strcmp(unitstr,obj.Unit)
                 disp('No need to convert')
                 return
             end
@@ -228,51 +228,51 @@ classdef JMAtide
             end
                         
             % % convert
-            if ~isempty(obj.ssh) ; obj.ssh  = factor*obj.ssh; end
-            if ~isempty(obj.ssha); obj.ssha = factor*obj.ssha; end
-            obj.unit = unitstr;
+            if ~isempty(obj.SSH) ; obj.SSH  = factor*obj.SSH; end
+            if ~isempty(obj.SSHanomaly); obj.SSHanomaly = factor*obj.SSHanomaly; end
+            obj.Unit = unitstr;
         end
     end
 
     %% Methods for plotting
     methods        
         %% Plot SSH
-        function line = PlotSSH(obj)
+        function line = plotssh(obj)
             % % array
             if numel(obj)>1
                 for i = 1:numel(obj)
-                    line(i) = obj(i).PlotSSH;
+                    line(i) = obj(i).plotssh;
                     hold on
                 end
                 hold off
                 return
             end            
             % % scalar
-            line = plot(obj.time, obj.ssh);
+            line = plot(obj.Time, obj.SSH);
         end    
         
         %% Plot SSHA
-        function line = PlotSSHA(obj)
+        function line = plotssha(obj)
             % % array
             if numel(obj)>1
                 for i = 1:numel(obj)
-                    line(i) = obj(i).PlotSSHA;
+                    line(i) = obj(i).plotssha;
                     hold on
                 end
                 hold off
                 return
             end            
             % % scalar
-            line = plot(obj.time, obj.ssha);
+            line = plot(obj.Time, obj.SSHanomaly);
         end        
     end
     
     %% Methods for output
     methods
         %% SSH
-        function CSVSSH(obj)
+        function csvssh(obj)
             nobj = numel(obj);
-            T = JMAtide.CreateReferenceTable;
+            T = JMAtide.createReferenceTable;
             
             % % setup
             iobj = 1;
@@ -283,38 +283,38 @@ classdef JMAtide
             % % loop count
             while iobj <= nobj
                 % % skip if empty
-                if isempty(obj(iobj).time) || isempty(obj(iobj).ssh)
-                    disp(['Empty: ', obj(iobj).station])
+                if isempty(obj(iobj).Time) || isempty(obj(iobj).SSH)
+                    disp(['Empty: ', obj(iobj).Station])
                     iobj = iobj + 1;
                     continue
                 end
                 
                 % % assign output matrix
-                t = obj(iobj).time;
-                foutmatrix = horzcat(foutmatrix, obj(iobj).ssh);
-                stationlist = horzcat(stationlist, obj(iobj).station,', ');
-                row = find(strcmp(obj(iobj).station,T.Name_ja), 1);
+                t = obj(iobj).Time;
+                foutmatrix = horzcat(foutmatrix, obj(iobj).SSH);
+                stationlist = horzcat(stationlist, obj(iobj).Station,', ');
+                row = find(strcmp(obj(iobj).Station,T.Name_ja), 1);
                 postfix = horzcat(postfix, T.ID{row});
                 
                 % % filename of output
-                fname = ['sealevel_',num2str(obj(iobj).year, '%04d'), ...
-                         num2str(obj(iobj).month, '%02d'), ...
+                fname = ['sealevel_',num2str(obj(iobj).Year, '%04d'), ...
+                         num2str(obj(iobj).Month, '%02d'), ...
                          '_',postfix,'.dat'];
                      
                 % % end of list
                 if iobj == nobj
                     disp(fname)
                     stationlist(end-1:end) = [];
-                    JMAtide.OutputTimeSeries(fname, stationlist, t, foutmatrix)
+                    JMAtide.outputTimeSeries(fname, stationlist, t, foutmatrix)
                     break
                 end
                 
                 % % output if the period is different from the next one
-                if obj(iobj).year~=obj(iobj+1).year || obj(iobj).month~=obj(iobj+1).month || ...
-                   isempty(obj(iobj+1).time) || isempty(obj(iobj+1).ssh)
+                if obj(iobj).Year~=obj(iobj+1).Year || obj(iobj).Month~=obj(iobj+1).Month || ...
+                   isempty(obj(iobj+1).Time) || isempty(obj(iobj+1).SSH)
                     disp(fname)
                     stationlist(end-1:end) = [];
-                    JMAtide.OutputTimeSeries(fname, stationlist, t, foutmatrix)
+                    JMAtide.outputTimeSeries(fname, stationlist, t, foutmatrix)
                     
                     foutmatrix = [];
                     stationlist = '# time, ';
@@ -327,9 +327,9 @@ classdef JMAtide
         end
         
         %% SSHA
-        function CSVSSHA(obj)
+        function csvssha(obj)
             nobj = numel(obj);
-            T = JMAtide.CreateReferenceTable;
+            T = JMAtide.createReferenceTable;
             
             % % setup
             iobj = 1;
@@ -340,38 +340,38 @@ classdef JMAtide
             % % loop count
             while iobj <= nobj
                 % % skip if empty
-                if isempty(obj(iobj).time) || isempty(obj(iobj).ssha)
-                    disp(['Empty: ', obj(iobj).station])
+                if isempty(obj(iobj).Time) || isempty(obj(iobj).SSHanomaly)
+                    disp(['Empty: ', obj(iobj).Station])
                     iobj = iobj + 1;
                     continue
                 end
                 
                 % % assign output matrix                
-                t = obj(iobj).time;
-                foutmatrix = horzcat(foutmatrix, obj(iobj).ssha);
-                stationlist = horzcat(stationlist, obj(iobj).station,', ');
-                row = find(strcmp(obj(iobj).station,T.Name_ja), 1);
+                t = obj(iobj).Time;
+                foutmatrix = horzcat(foutmatrix, obj(iobj).SSHanomaly);
+                stationlist = horzcat(stationlist, obj(iobj).Station,', ');
+                row = find(strcmp(obj(iobj).Station,T.Name_ja), 1);
                 postfix = horzcat(postfix, T.ID{row});
                 
                 % % filename of output
-                fname = ['sealevelanomaly_', num2str(obj(iobj).year, '%04d'), ...
-                         num2str(obj(iobj).month, '%02d'), ...
+                fname = ['sealevelanomaly_', num2str(obj(iobj).Year, '%04d'), ...
+                         num2str(obj(iobj).Month, '%02d'), ...
                          '_',postfix,'.dat'];
 
                 % % end of list
                 if iobj == nobj
                     disp(fname)
                     stationlist(end-1:end) = [];
-                    JMAtide.OutputTimeSeries(fname, stationlist, t, foutmatrix)
+                    JMAtide.outputTimeSeries(fname, stationlist, t, foutmatrix)
                     break
                 end
                 
                 % % output if the period is different from the next one
-                if obj(iobj).year~=obj(iobj+1).year || obj(iobj).month~=obj(iobj+1).month || ...
-                   isempty(obj(iobj+1).time) || isempty(obj(iobj+1).ssha)
+                if obj(iobj).Year~=obj(iobj+1).Year || obj(iobj).Month~=obj(iobj+1).Month || ...
+                   isempty(obj(iobj+1).Time) || isempty(obj(iobj+1).SSHanomaly)
                     disp(fname)
                     stationlist(end-1:end) = [];
-                    JMAtide.OutputTimeSeries(fname, stationlist, t, foutmatrix)
+                    JMAtide.outputTimeSeries(fname, stationlist, t, foutmatrix)
                     
                     foutmatrix = [];
                     stationlist = '# time, ';
@@ -388,7 +388,7 @@ classdef JMAtide
     %% Static methods
     methods (Static)
         %% Table of stations
-        function T = CreateReferenceTable
+        function T = createReferenceTable
             % % columns
             Number = {1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;53;54;55;56;57;58;59;60;61;62;63;64;65;66;67;68;69;70};
             ID = {'WN';'AS';'HN';'KR';'HK';'B3';'SH';'MY';'OF';'AY';'ON';'MR';'TK';'OK';'MJ';'CC';'MC';'OD';'G9';'UC';'SM';'OM';'MI';'I4';'NG';'TB';'OW';'KN';'UR';'KS';'SR';'GB';'WY';'TN';'OS';'KB';'ST';'UN';'MT';'TA';'KM';'AW';'MU';'KC';'TS';'UW';'X5';'AB';'KG';'MK';'TJ';'O9';'NH';'DJ';'IS';'YJ';'RH';'OU';'KT';'NS';'FE';'N5';'HA';'SK';'SA';'MZ';'SZ';'TY';'S0';'FK'};
@@ -407,7 +407,7 @@ classdef JMAtide
         end
         
         %% Output time-series data 
-        function OutputTimeSeries(fname, stationlist, t, foutmatrix)
+        function outputTimeSeries(fname, stationlist, t, foutmatrix)
             if isempty(foutmatrix); return; end
             
             [nrow, ncol] = size(foutmatrix);

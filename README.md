@@ -22,36 +22,36 @@ tidegauge = JMAtide('東京', 2019, 10)
 tidegauge =
   JMAtide のプロパティ:
 
-          station: '東京'
-             year: 2019
-            month: 10
-             time: []
-            ndays: []
-              ssh: []
-             ssha: []
-              lon: 139.7667
-              lat: 35.6500
-          url_ssh: 'https://www.data.jma.go.jp/gmd/kaiyou/data/db/tide/genbo/2019/201910/hry201910TK.txt'
-         url_ssha: 'https://www.data.jma.go.jp/gmd/kaiyou/data/db/tide/genbo/2019/201910/dep201910TK.txt'
-             unit: 'cm'
-    standard_time: 'JST(UTC+9)'
+          Station: '東京'
+             Year: 2019
+            Month: 10
+             Time: []
+            Ndays: []
+              SSH: []
+             SSHA: []
+              Lon: 139.7667
+              Lat: 35.6500
+          URL_ssh: 'https://www.data.jma.go.jp/gmd/kaiyou/data/db/tide/genbo/2019/201910/hry201910TK.txt'
+         URL_ssha: 'https://www.data.jma.go.jp/gmd/kaiyou/data/db/tide/genbo/2019/201910/dep201910TK.txt'
+             Unit: 'cm'
+    StandardTime: 'JST(UTC+9)'
 
 ```
 
 
-LoadSSH, LoadSSHA でそれぞれ潮位，潮位偏差を気象庁ウェブサイトから取得します．  
+loadssh, loadssha でそれぞれ潮位，潮位偏差を気象庁ウェブサイトから取得します．  
 格納されるプロパティ名は ssh と ssha です．
 
 ```matlab
-tidegauge = tidegauge.LoadSSH; % 潮位
-tidegauge = tidegauge.LoadSSHA; % 潮位偏差
+tidegauge = tidegauge.loadssh; % 潮位
+tidegauge = tidegauge.loadssha; % 潮位偏差
 ```
 
 PlotSSH，PlotSSHA で取得したデータの簡易的なプロットが可能です．
 
 ```matlab
 % 潮位のプロット
-tidegauge.PlotSSH;
+tidegauge.plotssh;
 ```
 <p align="center">
 <img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_0.png", width="600">
@@ -60,7 +60,7 @@ tidegauge.PlotSSH;
 
 ```matlab
 % 潮位偏差のプロット
-tidegauge.PlotSSHA;
+tidegauge.plotssha;
 ```
 <p align="center">
 <img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_1.png", width="600">
@@ -81,8 +81,8 @@ tidegauge = JMAtide('東京', 2019, 8:11)          % 2019年9月〜11月, (1x4)�
 
 
 ```matlab
-tidegauge = tidegauge.LoadSSHA;
-tidegauge.PlotSSHA;
+tidegauge = tidegauge.loadssha;
+tidegauge.plotssha;
 ```
 <p align="center">
 <img src="https://github.com/hydrocoast/JMAtide/blob/master/images/figure_2.png", width="600">
@@ -96,14 +96,14 @@ tidegauge.PlotSSHA;
 tidegauge = JMAtide({'布良','東京','岡田','三宅島（坪田）','小田原','石廊崎','内浦','清水港','御前崎'}, 2019, 10);
 
 % 潮位取得
-tidegauge = tidegauge.LoadSSH;
+tidegauge = tidegauge.loadssh;
 
 % 潮位偏差取得
-tidegauge = tidegauge.LoadSSHA;
+tidegauge = tidegauge.loadssha;
 
 % plot - 潮位偏差
-lines = tidegauge.PlotSSHA;
-xlim([tidegauge(1).time(24*8)+hours(1), tidegauge(1).time(24*14)])
+lines = tidegauge.plotssha;
+xlim([tidegauge(1).Time(24*8)+hours(1), tidegauge(1).Time(24*14)])
 legend(lines, {'布良','東京','岡田','三宅島（坪田）','小田原','石廊崎','内浦','清水港','御前崎'}, 'NumColumns',2, 'Location','NorthWest');
 ```
 <p align="center">
@@ -117,12 +117,12 @@ CSVSSH，CSVSSHAでそれぞれ潮位，潮位偏差を CSV ファイルとし�
 
 ```matlab
 % ファイル出力前に，単位を cm → m へ
-tidegauge = tidegauge.ConvertUnit('m');
+tidegauge = tidegauge.convertunit('m');
 
 % CSVファイルとして出力
 % 同一期間のため，全地点のデータを1つのファイルに格納
-tidegauge.CSVSSH  % 潮位
-tidegauge.CSVSSHA % 潮位偏差
+tidegauge.csvssh  % 潮位
+tidegauge.csvssha % 潮位偏差
 ```
 sealevel_201910_MRTKOKMJODG9UCSMOM.dat  
 sealevelanomaly_201910_MRTKOKMJODG9UCSMOM.dat
