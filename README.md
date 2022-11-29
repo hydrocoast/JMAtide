@@ -47,7 +47,7 @@ tidegauge = tidegauge.loadssh; % 潮位
 tidegauge = tidegauge.loadssha; % 潮位偏差
 ```
 
-PlotSSH，PlotSSHA で取得したデータの簡易的なプロットが可能です．
+plotssh，plotssha で取得したデータの簡易的なプロットが可能です．
 
 ```matlab
 % 潮位のプロット
