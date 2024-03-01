@@ -1,9 +1,9 @@
 # 気象庁 潮汐観測資料 確定値 データ取得
 ## 概要
 このリポジトリは[気象庁](https://www.jma.go.jp/jma/index.html)が
-ウェブサイトで公開している「潮汐観測資料」の毎時潮位・潮位偏差のデータ取得ツールです．   
-[潮汐観測資料 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/genbo/format.html)
-を参考に構築されています．  
+ウェブサイトで公開している「潮位表」の推算潮位（天文潮位）および「潮汐観測資料」の毎時潮位・潮位偏差のデータ取得ツールです．   
+[潮位表 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/suisan/readme.html)および[潮汐観測資料 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/genbo/format.html)
+を参考にテキストファイルを読み取ることで実行されます．  
 実行には MATLAB が必要です．
 
 ## 使い方
@@ -15,27 +15,7 @@
 このため，観測地点名・年・月を入力してインスタンスを生成し，変数の初期化を行います．
 
 ```matlab
-tidegauge = JMAtide('東京', 2019, 10)
-```
-
-```text
-tidegauge =
-  JMAtide のプロパティ:
-
-          Station: '東京'
-             Year: 2019
-            Month: 10
-             Time: []
-            Ndays: []
-              SSH: []
-             SSHA: []
-              Lon: 139.7667
-              Lat: 35.6500
-          URL_ssh: 'https://www.data.jma.go.jp/gmd/kaiyou/data/db/tide/genbo/2019/201910/hry201910TK.txt'
-         URL_ssha: 'https://www.data.jma.go.jp/gmd/kaiyou/data/db/tide/genbo/2019/201910/dep201910TK.txt'
-             Unit: 'cm'
-    StandardTime: 'JST(UTC+9)'
-
+tidegauge = JMAtide('東京', 2019, 10);
 ```
 
 
