@@ -310,7 +310,23 @@ classdef JMAtide
 
         %% get estimated astronimical tidal level
         function tidelevel = getastronomicaltide(obj,time)
-            if numel(obj)>1; error('Object array is currently not supported.'); end
+            if numel(obj)>1
+                if numel(time)==1
+                    tidelevel = NaN*zeros(size(obj));
+                    for i = 1:numel(obj)
+                        tidelevel(i) = obj(i).getastronomicaltide(time);
+                    end
+                    return
+                elseif numel(time)==numel(obj)
+                    tidelevel = NaN*zeros(size(obj));
+                    for i = 1:numel(obj)
+                        tidelevel(i) = obj(i).getastronomicaltide(time(i));
+                    end
+                    return
+                else
+                    error('Object array is currently not supported.');
+                end
+            end
             if isempty(obj.AstronomicalTide); error('Please load tidal level via obj = obj.loadastoronomicaltide() before doing this.'); end
             if ~isdatetime(time); error('time must be a type of datetime.'); end
             nq = numel(time);
