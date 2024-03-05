@@ -30,7 +30,7 @@ plotastronomicaltide で取得したデータの簡易的なプロットが可�
 station.plotastronomicaltide;
 ```
 <p align="center">
-<img src="/images/figure_0.png", width="600">
+<img src="/images/figure_atide_ex.png", width="600">
 </p>
 
 
