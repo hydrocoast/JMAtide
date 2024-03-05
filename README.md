@@ -35,6 +35,7 @@ station.plotastronomicaltide;
 緯度経度を入力して，一番近い潮位表の掲載地点を求めることもできます．
 ```matlab
 stationname = JMAtide.findNearestStationForAstro([136.674; 137.263], [37.168; 37.434]) % lon, lat
+
 stationname =
   2×1 の cell 配列
     {'輪島'}
@@ -50,6 +51,7 @@ station = JMAtide(stationname, 2024, 1);
 station = station.loadastronimocaltide;
 % 特定時刻の推算潮位の抽出 2024/01/25T19:15
 atide = station.getastronomicaltide(datetime(2024,1,25,19,15,0,0))
+
 atide =
    21.0000
    24.8500
@@ -58,6 +60,7 @@ atide =
 ```matlab
 % 2024年1月でない時刻の指定
 station.getastronomicaltide(datetime(2024,2,1,3,10,0,0))
+
 ans =
    NaN
    NaN
@@ -153,11 +156,10 @@ tidegauge = tidegauge.convertunit('m');
 % 同一期間のため，全地点のデータを1つのファイルに格納
 tidegauge.csvssh  % 潮位
 tidegauge.csvssha % 潮位偏差
+
+  sealevel_201910_MRTKOKMJODG9UCSMOM.dat  
+  sealevelanomaly_201910_MRTKOKMJODG9UCSMOM.dat
 ```
-
-sealevel_201910_MRTKOKMJODG9UCSMOM.dat
-sealevelanomaly_201910_MRTKOKMJODG9UCSMOM.dat
-
 ```matlab
 % 出力ファイルの確認 1行目〜10行目
 dbtype sealevel_201910_MRTKOKMJODG9UCSMOM.dat 1:10
