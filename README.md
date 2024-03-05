@@ -1,8 +1,8 @@
-# 気象庁 潮汐観測資料 確定値 データ取得
+# 気象庁 潮位表・潮汐観測資料 データ取得
 
 ## 概要
 このリポジトリは[気象庁](https://www.jma.go.jp/jma/index.html)
-がウェブサイトで公開している「潮位表」の推算潮位（天文潮位）および「潮汐観測資料」の毎時潮位・潮位偏差のデータ取得ツールです．
+がウェブサイトで公開している「潮位表」の推算潮位（天文潮位）および「潮汐観測資料」の毎時潮位・潮位偏差（確定値）のデータ取得ツールです．
 [潮位表 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/suisan/readme.html)
 および
 [潮汐観測資料 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/genbo/format.html)
