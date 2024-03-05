@@ -9,11 +9,8 @@
 を参考にテキストファイルを読み取ることで実行されます．
 実行には MATLAB が必要です．
 
-## 使い方
-### はじめに
-このリポジトリをクローンし，そのディレクトリを自身の MATLAB 環境の path に追加してください．
-
-### 潮位表（天文潮位の推算値）読み取り
+## 潮位表（天文潮位の推算値）読み取り
+### 基本
 取得したい地点名・年・月を入力してインスタンスを生成します．
 ```matlab
 station = JMAtide('能登', 2024, 1);
@@ -30,7 +27,7 @@ plotastronomicaltide で取得したデータの簡易的なプロットが可�
 station.plotastronomicaltide;
 ```
 <p align="center">
-<img src="/images/figure_atide_ex.png", width="600">
+<img src="/images/figure_atide_ex.png", width="450">
 </p>
 
 
@@ -38,8 +35,6 @@ station.plotastronomicaltide;
 緯度経度を入力して，一番近い潮位表の掲載地点を求めることもできます．
 ```matlab
 stationname = JMAtide.findNearestStationForAstro([136.674; 137.263], [37.168; 37.434]) % lon, lat
-```
-```text
 stationname =
   2×1 の cell 配列
     {'輪島'}
@@ -55,8 +50,6 @@ station = JMAtide(stationname, 2024, 1);
 station = station.loadastronimocaltide;
 % 特定時刻の推算潮位の抽出 2024/01/25T19:15
 atide = station.getastronomicaltide(datetime(2024,1,25,19,15,0,0))
-```
-```text
 atide =
    21.0000
    24.8500
@@ -65,14 +58,13 @@ atide =
 ```matlab
 % 2024年1月でない時刻の指定
 station.getastronomicaltide(datetime(2024,2,1,3,10,0,0))
-```
-```text
 ans =
    NaN
    NaN
 ```
 
-### 観測潮位，潮位偏差の読み取り
+## 観測潮位，潮位偏差の読み取り
+### 基本
 気象庁の毎時潮位観測資料は，地点ごとおよび月ごとにファイルが分かれています．
 このため，観測地点名・年・月を入力してインスタンスを生成し，変数の初期化を行います．
 
