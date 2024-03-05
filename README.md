@@ -1,25 +1,86 @@
 # 気象庁 潮汐観測資料 確定値 データ取得
+
 ## 概要
-このリポジトリは[気象庁](https://www.jma.go.jp/jma/index.html)が
-ウェブサイトで公開している「潮位表」の推算潮位（天文潮位）および「潮汐観測資料」の毎時潮位・潮位偏差のデータ取得ツールです．   
-[潮位表 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/suisan/readme.html)および[潮汐観測資料 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/genbo/format.html)
-を参考にテキストファイルを読み取ることで実行されます．  
+このリポジトリは[気象庁](https://www.jma.go.jp/jma/index.html)
+がウェブサイトで公開している「潮位表」の推算潮位（天文潮位）および「潮汐観測資料」の毎時潮位・潮位偏差のデータ取得ツールです．
+[潮位表 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/suisan/readme.html)
+および
+[潮汐観測資料 テキストファイルフォーマット](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/genbo/format.html)
+を参考にテキストファイルを読み取ることで実行されます．
 実行には MATLAB が必要です．
 
 ## 使い方
 ### はじめに
 このリポジトリをクローンし，そのディレクトリを自身の MATLAB 環境の path に追加してください．
 
-### 基本
-気象庁の毎時潮位観測資料は，地点ごとおよび月ごとにファイルが分かれています．  
+### 潮位表（天文潮位の推算値）読み取り
+取得したい地点名・年・月を入力してインスタンスを生成します．
+```matlab
+station = JMAtide('能登', 2024, 1);
+```
+続いて，loadastronimocaltide メソッドでそれぞれ潮位，潮位偏差を気象庁ウェブサイトから取得します． 
+格納されるプロパティ名は AstronomicalTide です．
+```matlab
+station = station.loadastronimocaltide; % 推算潮位の取得
+```
+
+plotastronomicaltide で取得したデータの簡易的なプロットが可能です．
+```matlab
+% 潮位のプロット
+station.plotastronomicaltide;
+```
+<p align="center">
+<img src="/images/figure_0.png", width="600">
+</p>
+
+
+### 最も近い潮位表掲載地点の検出
+緯度経度を入力して，一番近い潮位表の掲載地点を求めることもできます．
+```matlab
+stationname = JMAtide.findNearestStationForAstro([136.674; 137.263], [37.168; 37.434]) % lon, lat
+```
+```text
+stationname =
+  2×1 の cell 配列
+    {'輪島'}
+    {'能登'}
+```
+
+### 特定時刻の推算（天文）潮位の取得
+月ごとの推算潮位を取得後に datetime 型で日時を指定することで，特定時刻の推算潮位を毎時データから内挿で求めることができます．
+```matlab
+% 2024年1月
+station = JMAtide(stationname, 2024, 1);
+% 毎時推算潮位取得
+station = station.loadastronimocaltide;
+% 特定時刻の推算潮位の抽出 2024/01/25T19:15
+atide = station.getastronomicaltide(datetime(2024,1,25,19,15,0,0))
+```
+```text
+atide =
+   21.0000
+   24.8500
+```
+対象期間外の時刻を指定して潮位を取得しようとした場合，NaN を返します．
+```matlab
+% 2024年1月でない時刻の指定
+station.getastronomicaltide(datetime(2024,2,1,3,10,0,0))
+```
+```text
+ans =
+   NaN
+   NaN
+```
+
+### 観測潮位，潮位偏差の読み取り
+気象庁の毎時潮位観測資料は，地点ごとおよび月ごとにファイルが分かれています．
 このため，観測地点名・年・月を入力してインスタンスを生成し，変数の初期化を行います．
 
 ```matlab
 tidegauge = JMAtide('東京', 2019, 10);
 ```
 
-
-loadssh, loadssha でそれぞれ潮位，潮位偏差を気象庁ウェブサイトから取得します．  
+loadssh, loadssha でそれぞれ潮位，潮位偏差を気象庁ウェブサイトから取得します．
 格納されるプロパティ名は ssh と ssha です．
 
 ```matlab
@@ -35,8 +96,7 @@ tidegauge.plotssh;
 ```
 <p align="center">
 <img src="/images/figure_0.png", width="600">
-</p>  
-
+</p>
 
 ```matlab
 % 潮位偏差のプロット
@@ -44,7 +104,7 @@ tidegauge.plotssha;
 ```
 <p align="center">
 <img src="/images/figure_1.png", width="600">
-</p>  
+</p>
 
 ### 長期（２ヶ月以上）のデータ取得
 年月の指定部分に配列を入力することで，長期間の潮位データを対象とすることが可能です．
@@ -55,10 +115,9 @@ tidegauge = JMAtide('東京', [2018,09; 2019,10]); % 2018年9月 と 2019年10�
 tidegauge = JMAtide('東京', 2019, 8:11)          % 2019年9月〜11月, (1x4)配列
 ```
 
-| |1|2|3|4|
-|:--:|:--:|:--:|:--:|:--:|
-|1|1x1 JMAtide|1x1 JMAtide|1x1 JMAtide|1x1 JMAtide|
-
+| |      1      |      2      |      3      |      4      |
+| :-: | :---------: | :---------: | :---------: | :---------: |
+| 1 | 1x1 JMAtide | 1x1 JMAtide | 1x1 JMAtide | 1x1 JMAtide |
 
 ```matlab
 tidegauge = tidegauge.loadssha;
@@ -66,7 +125,7 @@ tidegauge.plotssha;
 ```
 <p align="center">
 <img src="/images/figure_2.png", width="600">
-</p>  
+</p>
 
 ### 複数地点のデータ取得
 地点名を cell 配列で複数指定すると，複数地点の潮位データを同時に扱えます．
@@ -88,8 +147,7 @@ legend(lines, {'布良','東京','岡田','三宅島（坪田）','小田原','�
 ```
 <p align="center">
 <img src="/images/figure_3.png", width="600">
-</p>  
-
+</p>
 
 ### CSVファイルへの出力
 csvssh，csvsshaでそれぞれ潮位，潮位偏差を csv ファイルとして出力します．
@@ -104,9 +162,9 @@ tidegauge = tidegauge.convertunit('m');
 tidegauge.csvssh  % 潮位
 tidegauge.csvssha % 潮位偏差
 ```
-sealevel_201910_MRTKOKMJODG9UCSMOM.dat  
-sealevelanomaly_201910_MRTKOKMJODG9UCSMOM.dat
 
+sealevel_201910_MRTKOKMJODG9UCSMOM.dat
+sealevelanomaly_201910_MRTKOKMJODG9UCSMOM.dat
 
 ```matlab
 % 出力ファイルの確認 1行目〜10行目
@@ -125,16 +183,14 @@ dbtype sealevel_201910_MRTKOKMJODG9UCSMOM.dat 1:10
 10    20191001T0800,    1.840,    2.610,    1.970,    5.000,    3.890,    4.640,    2.500,    2.640,    2.850
 ```
 
-
 ## 注意
-- 速報値ではなく，確定値が格納されたファイルを取得します．  
-- [2020年観測地点一覧表（気象庁）](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/genbo/station.php)の地点記号，観測地点名をもとにしています．この表に記載されている通りに地点名を入力しないと値を取得できません
-  （例：×三宅島，✔︎三宅島（坪田））
-
+- 速報値ではなく，確定値が格納されたファイルを取得します．
+- [観測地点一覧表（気象庁）](https://www.data.jma.go.jp/gmd/kaiyou/db/tide/genbo/station.php)の地点記号，観測地点名をもとにしています．この表に記載されている通りに地点名を入力しないと値を取得できません
+  （例：×三宅島，✔︎三宅島（坪田））．また，年月日によっては掲載されていても取得できない地点があります．
 
 ## License
 MIT
 
 ## Author
-[Takuya Miyashita](https://github.com/hydrocoast)  
+[Takuya Miyashita](https://github.com/hydrocoast)
 miyashita@hydrocoast.jp
